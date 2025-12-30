@@ -3,102 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App - Full</title>
+    <title>WhatsApp Clone</title>
     <style>
-        body { font-family: sans-serif; background: #e5ddd5; margin: 0; display: flex; justify-content: center; height: 100vh; }
-        .container { width: 100%; max-width: 450px; background: white; display: flex; flex-direction: column; height: 100%; position: relative; }
-
-        /* Login Screen */
-        #login-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 10; display: flex;
-            flex-direction: column; justify-content: center; align-items: center; text-align: center;
+        /* --- CSS VARIABLES --- */
+        :root {
+            --bg-body: #d1d7db;
+            --bg-sidebar: #ffffff;
+            --bg-header: #f0f2f5;
+            --bg-chat: #efeae2;
+            --bg-input: #ffffff;
+            --border-color: #e9edef;
+            --text-primary: #111b21;
+            --text-secondary: #667781;
+            --hover-color: #f5f6f6;
+            --active-color: #f0f2f5;
+            --my-bubble: #d9fdd3;
+            --friend-bubble: #ffffff;
+            --green-primary: #00a884;
+            --shadow-color: rgba(0,0,0,0.1);
+            --invert-icon: 0;
+            --modal-bg: #ffffff;
+            --typing-color: #25d366;
         }
-        .btn-google { background: #4285F4; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
-        /* App Screen */
-        #app-screen { display: none; flex-direction: column; height: 100%; }
+        body.dark-mode {
+            --bg-body: #090e11;
+            --bg-sidebar: #111b21;
+            --bg-header: #202c33;
+            --bg-chat: #0b141a;
+            --bg-input: #2a3942;
+            --border-color: #2a3942;
+            --text-primary: #e9edef;
+            --text-secondary: #8696a0;
+            --hover-color: #202c33;
+            --active-color: #2a3942;
+            --my-bubble: #005c4b;
+            --friend-bubble: #202c33;
+            --green-primary: #00a884;
+            --shadow-color: rgba(0,0,0,0.3);
+            --invert-icon: 1;
+            --modal-bg: #3b4a54;
+            --typing-color: #00a884;
+        }
+
+        * { box-sizing: border-box; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background: var(--bg-body); height: 100vh; overflow: hidden; }
         
-        /* Header */
-        header { background: #008069; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
-        .user-details { font-size: 13px; }
-        .uid-copy { font-family: monospace; background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 3px; cursor: pointer; }
-        .btn-logout { background: none; border: 1px solid white; color: white; border-radius: 3px; cursor: pointer; font-size: 11px; padding: 5px; }
+        .app-container {
+            display: none; width: 100%; height: 100vh;
+            background: var(--bg-sidebar); max-width: 1600px; margin: 0 auto;
+            box-shadow: 0 0 20px var(--shadow-color);
+        }
 
-        /* Input ID Teman */
-        .friend-input-area { background: #f0f0f0; padding: 10px; display: flex; gap: 5px; border-bottom: 1px solid #ddd; }
-        .friend-input-area input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
-        .friend-input-area button { background: #008069; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
+        /* SIDEBAR */
+        .sidebar { width: 30%; min-width: 340px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; background: var(--bg-sidebar); }
 
-        /* Area Chat */
-        #chat-container { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; background: #e5ddd5; }
-        .bubble { max-width: 70%; padding: 8px 12px; border-radius: 8px; font-size: 14px; line-height: 1.4; position: relative; word-wrap: break-word; }
+        .header-left {
+            background: var(--bg-header); padding: 10px 16px; min-height: 80px;
+            display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color);
+        }
         
-        .bubble.me { align-self: flex-end; background: #d9fdd3; border-radius: 8px 0 8px 8px; }
-        .bubble.them { align-self: flex-start; background: white; border-radius: 0 8px 8px 8px; }
+        .my-profile-area { display: flex; align-items: center; flex: 1; margin-right: 10px; overflow: hidden; }
+        .my-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 10px; background: #dfe3e5; cursor: pointer; border: 2px solid transparent; flex-shrink: 0; }
+        .my-info { display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+        .my-name { font-weight: bold; font-size: 15px; color: var(--text-primary); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        .bubble .sender { font-size: 10px; color: #888; margin-bottom: 3px; display: block; font-weight: bold; }
+        .uid-badge {
+            display: inline-flex; align-items: center; gap: 5px; margin-top: 3px;
+            background: var(--bg-input); padding: 2px 6px; border-radius: 4px;
+            width: fit-content; cursor: pointer; border: 1px solid var(--border-color);
+        }
+        .uid-badge:hover { opacity: 0.8; }
+        .uid-text { font-size: 10px; color: var(--text-secondary); font-family: monospace; font-weight: bold; }
+        .copy-icon { filter: invert(var(--invert-icon)); font-size: 10px; }
 
-        /* Kirim Pesan */
-        .message-input-area { padding: 10px; background: #f0f0f0; display: flex; gap: 5px; }
-        .message-input-area input { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #ccc; outline: none; }
-        .message-input-area button { background: #008069; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .btn-theme { background: none; border: none; font-size: 18px; cursor: pointer; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.5s; }
+        .btn-theme:hover { background: rgba(0,0,0,0.05); }
+        .btn-logout { font-size: 11px; color: #d32f2f; border: 1px solid #d32f2f; background: transparent; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-weight: bold; flex-shrink: 0; }
 
-        .hidden { display: none !important; }
+        .search-box { padding: 10px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border-color); }
+        .input-group { display: flex; gap: 5px; }
+        .input-group input { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-header); outline: none; color: var(--text-primary); }
+        .input-group button { background: var(--green-primary); color: white; border: none; padding: 0 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        .contact-list { flex: 1; overflow-y: auto; background: var(--bg-sidebar); }
+        .contact-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: 0.2s; position: relative; }
+        .contact-item:hover { background: var(--hover-color); }
+        .contact-item.active { background: var(--active-color); }
+        
+        .contact-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 15px; background: #dfe3e5; flex-shrink: 0; }
+        .contact-info { flex: 1; overflow: hidden; }
+        .contact-name { font-weight: 500; font-size: 16px; color: var(--text-primary); margin-bottom: 3px; }
+        .contact-preview { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .unread-badge { background-color: #25d366; color: #111b21; min-width: 20px; height: 20px; border-radius: 50%; font-size: 11px; font-weight: bold; display: flex; align-items: center; justify-content: center; padding: 0 5px; margin-left: 10px; animation: popIn 0.2s; }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        .unread-badge.hidden { display: none; }
+
+        /* CHAT AREA */
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: var(--bg-chat); position: relative; }
+        
+        .header-right { 
+            height: 60px; background: var(--bg-header); padding: 10px 16px; 
+            display: flex; align-items: center; justify-content: space-between; 
+            border-bottom: 1px solid var(--border-color); visibility: hidden; 
+        }
+        
+        .header-info-group { display: flex; align-items: center; cursor: pointer; }
+        .header-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; margin-right: 15px; background: #dfe3e5; }
+        
+        /* Animasi Text Typing */
+        @keyframes pulseText { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+        .typing-text { color: var(--typing-color) !important; font-weight: bold; animation: pulseText 1.5s infinite; }
+
+        .timer-btn { 
+            background: none; border: none; font-size: 20px; cursor: pointer; 
+            color: var(--text-secondary); width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; position: relative;
+        }
+        .timer-btn:hover { background: rgba(0,0,0,0.05); color: var(--green-primary); }
+        .timer-indicator { position: absolute; bottom: 8px; right: 8px; font-size: 10px; background: var(--green-primary); color: white; padding: 2px; border-radius: 50%; width: 12px; height: 12px; display: flex; align-items: center; justify-content: center; }
+
+        .messages-container {
+            flex: 1; overflow-y: auto; padding: 20px 50px; display: flex; flex-direction: column; gap: 8px;
+            background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
+            background-blend-mode: overlay; opacity: 1;
+        }
+        body.dark-mode .messages-container { opacity: 0.8; background-blend-mode: soft-light; }
+
+        .empty-state { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-sidebar); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-bottom: 6px solid var(--green-primary); z-index: 5; }
+        .empty-state h1 { color: var(--text-primary); }
+        .empty-state p { color: var(--text-secondary); }
+
+        .bubble { max-width: 60%; padding: 8px 12px; border-radius: 8px; font-size: 14px; line-height: 1.4; position: relative; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); word-wrap: break-word; color: var(--text-primary); }
+        .bubble.me { align-self: flex-end; background: var(--my-bubble); }
+        .bubble.them { align-self: flex-start; background: var(--friend-bubble); }
+        .bubble-time { font-size: 10px; color: var(--text-secondary); float: right; margin-top: 5px; margin-left: 10px; display: flex; align-items: center; gap: 3px; }
+        
+        .tick { font-size: 14px; color: var(--text-secondary); transition: color 0.3s ease; }
+        .tick.read { color: #53bdeb; }
+
+        .system-msg { align-self: center; background: rgba(255,220,100, 0.3); color: var(--text-secondary); padding: 5px 12px; border-radius: 10px; font-size: 12px; margin: 10px 0; border: 1px solid rgba(0,0,0,0.05); text-align: center; }
+        
+        .chat-footer { min-height: 60px; background: var(--bg-header); padding: 10px; display: flex; align-items: center; gap: 10px; visibility: hidden; }
+        .chat-footer input { flex: 1; padding: 12px; border-radius: 8px; border: none; outline: none; background: var(--bg-input); color: var(--text-primary); }
+        .chat-footer button { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--green-primary); color: white; cursor: pointer; font-size: 18px; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+        .modal-content { background: var(--modal-bg); padding: 25px; border-radius: 12px; width: 350px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); color: var(--text-primary); }
+        .modal-content h3 { margin-top: 0; color: var(--text-primary); }
+        .modal-content input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-input); color: var(--text-primary); }
+        .modal-content img { width: 80px; height: 80px; border-radius: 50%; margin: 10px auto; object-fit: cover; border: 2px solid var(--green-primary); }
+        
+        .btn-save { background: var(--green-primary); color: white; border: none; padding: 10px 20px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-cancel { background: transparent; border: 1px solid var(--text-secondary); color: var(--text-primary); padding: 10px 20px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 5px; }
+
+        .radio-group { text-align: left; margin: 15px 0; }
+        .radio-option { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+        .radio-option:hover { background: var(--bg-header); }
+        .radio-option input { width: auto; margin-right: 15px; }
+        .radio-option label { cursor: pointer; flex: 1; font-weight: 500; }
+
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-header); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99; color: var(--text-primary); }
+        .btn-google { background: #4285F4; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div id="login-screen">
-            <h2>Chat App</h2>
-            <p>Login biar ID gak berubah-ubah.</p>
-            <button class="btn-google" onclick="loginGoogle()">Masuk dengan Google</button>
-        </div>
+    <div id="login-screen">
+        <h2>WhatsApp Clone</h2>
+        <p>Login untuk mulai chat.</p>
+        <button class="btn-google" onclick="loginGoogle()">Masuk dengan Google</button>
+    </div>
 
-        <div id="app-screen">
-            <header>
-                <div class="user-details">
-                    <div id="my-name">Loading...</div>
-                    <div id="my-uid" class="uid-copy" onclick="copyUID()">UID: ... (Klik Copy)</div>
+    <div id="profile-modal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Profil</h3>
+            <img id="preview-avatar" src="https://via.placeholder.com/80">
+            <input type="file" id="file-input" accept="image/*" onchange="previewImage()">
+            <input type="text" id="edit-name" placeholder="Nama">
+            <input type="text" id="edit-bio" placeholder="Bio">
+            <button class="btn-save" onclick="saveProfile()">Simpan</button>
+            <button class="btn-cancel" onclick="closeModal('profile-modal')">Batal</button>
+        </div>
+    </div>
+
+    <div id="expiry-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="display:flex; align-items:center; justify-content:center; gap:10px;">
+                <span style="font-size:24px;">⏱️</span> Pesan Sementara
+            </h3>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:15px;">
+                Pesan baru akan otomatis hilang dari chat ini setelah durasi yang dipilih.
+            </p>
+            
+            <div class="radio-group">
+                <div class="radio-option" onclick="selectExpiry(24)">
+                    <input type="radio" name="expiry" id="exp-24" value="24">
+                    <label for="exp-24">24 Jam</label>
                 </div>
-                <button class="btn-logout" onclick="logoutGoogle()">Keluar</button>
+                <div class="radio-option" onclick="selectExpiry(168)">
+                    <input type="radio" name="expiry" id="exp-7" value="168">
+                    <label for="exp-7">7 Hari</label>
+                </div>
+                <div class="radio-option" onclick="selectExpiry(720)">
+                    <input type="radio" name="expiry" id="exp-30" value="720">
+                    <label for="exp-30">30 Hari</label>
+                </div>
+                <div class="radio-option" onclick="selectExpiry(0)">
+                    <input type="radio" name="expiry" id="exp-off" value="0">
+                    <label for="exp-off">Mati (Off)</label>
+                </div>
+            </div>
+
+            <button class="btn-cancel" onclick="closeModal('expiry-modal')">Tutup</button>
+        </div>
+    </div>
+
+    <div id="app-screen" class="app-container">
+        <aside class="sidebar">
+            <header class="header-left">
+                <div class="my-profile-area">
+                    <img src="https://via.placeholder.com/50" class="my-avatar" id="my-avatar-display" onclick="openProfileModal()">
+                    <div class="my-info">
+                        <span class="my-name" id="my-name-display" onclick="openProfileModal()">Loading...</span>
+                        <div class="uid-badge" onclick="copyUID()" title="Salin UID">
+                            <span class="uid-text" id="my-uid-text">UID: ...</span>
+                            <span class="copy-icon">❐</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="btn-theme" onclick="toggleTheme()" id="theme-btn" title="Ganti Mode">🌙</button>
+                    <button class="btn-logout" onclick="logoutGoogle()">Keluar</button>
+                </div>
             </header>
 
-            <div class="friend-input-area">
-                <input type="text" id="friend-id-input" placeholder="Masukkan UID Teman disini...">
-                <button onclick="setLawanBicara()">Mulai</button>
-            </div>
-
-            <div id="chat-container">
-                <div style="text-align:center; color:#888; font-size:12px; margin-top:20px;">
-                    Belum ada chat. Masukkan UID teman di atas untuk mulai.
+            <div class="search-box">
+                <div class="input-group">
+                    <input type="text" id="new-friend-uid" placeholder="UID Teman...">
+                    <button onclick="manualStartChat()">Chat</button>
                 </div>
             </div>
 
-            <div class="message-input-area">
-                <input type="text" id="msg-input" placeholder="Ketik pesan...">
-                <button onclick="kirimPesan()">➤</button>
+            <div class="contact-list" id="contact-list"></div>
+        </aside>
+
+        <main class="chat-area">
+            <div id="welcome-screen" class="empty-state">
+                <h1>WhatsApp Clone</h1>
+                <p>Klik teman di kiri untuk chat.</p>
             </div>
-        </div>
+
+            <header class="header-right" id="chat-header">
+                <div class="header-info-group">
+                    <img src="https://via.placeholder.com/35" class="header-avatar" id="header-friend-avatar">
+                    <div>
+                        <div class="contact-name" id="current-friend-name">Nama Teman</div>
+                        <div style="font-size:11px; color:var(--text-secondary); transition: all 0.3s;" id="current-friend-bio">Online</div>
+                    </div>
+                </div>
+
+                <button class="timer-btn" onclick="openExpiryModal()" title="Pesan Sementara">
+                    ⏱️
+                    <div id="timer-active-dot" class="timer-indicator" style="display:none;">!</div>
+                </button>
+            </header>
+
+            <div class="messages-container" id="messages-box"></div>
+
+            <footer class="chat-footer" id="chat-footer">
+                <input type="text" id="msg-input" placeholder="Ketik pesan..." onkeypress="handleEnter(event)" oninput="handleTyping()">
+                <button onclick="kirimPesan()">➤</button>
+            </footer>
+        </main>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
-        import { getDatabase, ref, push, onChildAdded, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+        import { getDatabase, ref, push, set, update, remove, onValue, onChildAdded, onChildChanged, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 
-        // =======================================================
-        // PASTE CONFIG FIREBASE KAMU DISINI (YANG TADI)
-        // =======================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDHd3g5X-nJpeW5bvd4tdCp1fdv8nvqsn4",
-              authDomain: "whatsapp-clone-e158f.firebaseapp.com",
-              projectId: "whatsapp-clone-e158f",
-              storageBucket: "whatsapp-clone-e158f.firebasestorage.app",
-              messagingSenderId: "544454324372",
-              appId: "1:544454324372:web:011c4b6ddaa3d053318481",
-            databaseURL: "https://whatsapp-clone-e158f-default-rtdb.asia-southeast1.firebasedatabase.app/" // <-- Pastikan ini ada!
+            authDomain: "whatsapp-clone-e158f.firebaseapp.com",
+            projectId: "whatsapp-clone-e158f",
+            storageBucket: "whatsapp-clone-e158f.firebasestorage.app",
+            messagingSenderId: "544454324372",
+            appId: "1:544454324372:web:011c4b6ddaa3d053318481",
+            databaseURL: "https://whatsapp-clone-e158f-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -107,90 +302,398 @@
         const provider = new GoogleAuthProvider();
 
         let myUID = null;
-        let myName = null;
-        let friendUID = null; // ID Teman yang sedang dichat
+        let activeFriendUID = null;
+        let currentRoomID = null;
+        let knownContacts = new Set();
+        let globalUsersData = {}; 
+        let loginTime = Date.now(); // CATAT WAKTU LOGIN UNTUK FILTER NOTIF
 
-        // --- AUTHENTICATION ---
-        window.loginGoogle = () => signInWithPopup(auth, provider);
+        // Sound Notifikasi (Link MP3 Singkat)
+        const notifSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
+
+        // LISTENER VARIABLES
+        let unsubscribeAdded = null;
+        let unsubscribeChanged = null;
+        let unsubscribeExpiry = null;
+        let unsubscribeTyping = null; 
+        
+        let typingTimeout = null; 
+
+        // --- DARK MODE ---
+        window.toggleTheme = () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.getElementById('theme-btn').innerText = isDark ? "☀" : "🌙";
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        };
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('theme-btn').innerText = "☀";
+        }
+
+        // --- AUTH & NOTIFICATION PERMISSION ---
+        window.loginGoogle = () => {
+            signInWithPopup(auth, provider).then(() => {
+                // MINTA IZIN NOTIFIKASI SAAT LOGIN BERHASIL
+                if (Notification.permission !== "granted") {
+                    Notification.requestPermission();
+                }
+            });
+        };
+        
         window.logoutGoogle = () => signOut(auth).then(() => location.reload());
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 myUID = user.uid;
-                myName = user.displayName;
+                loginTime = Date.now(); // Reset waktu login
                 
-                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'flex';
-                document.getElementById('my-name').innerText = myName;
-                document.getElementById('my-uid').innerText = "UID Saya: " + myUID;
+                document.getElementById('my-uid-text').innerText = "UID: " + user.uid.substring(0,8) + "..";
+
+                onValue(ref(db, 'users/' + myUID), (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) updateMyProfileUI(data.name, data.bio, data.avatar);
+                    else saveToDB(user.displayName, "Available", user.photoURL);
+                });
+                loadContactList();
+
+                // Minta izin lagi kalau belum (fallback)
+                if (Notification.permission !== "granted") {
+                    Notification.requestPermission();
+                }
             }
         });
 
-        // --- LOGIKA CHAT ---
-        
-        // 1. Set Teman Bicara
-        window.setLawanBicara = () => {
-            let inputVal = document.getElementById('friend-id-input').value.trim();
-            if(!inputVal) return alert("Isi UID teman dulu!");
-            if(inputVal === myUID) return alert("Jangan chat diri sendiri, nanti gila.");
-            
-            friendUID = inputVal;
-            alert("Mulai chat dengan UID: " + friendUID);
-            
-            // Bersihkan layar chat dulu
-            document.getElementById('chat-container').innerHTML = '';
-            
-            // Load Chat (Dengar pesan masuk)
-            loadChat();
-        };
+        // --- NOTIFICATION FUNCTION ---
+        function showNotification(senderName, message) {
+            // Bunyikan Suara
+            notifSound.play().catch(e => console.log("Audio play failed (user interactions needed first)"));
 
-        // 2. Kirim Pesan
-        window.kirimPesan = () => {
-            let msg = document.getElementById('msg-input').value;
-            if(!msg || !friendUID) return;
+            // Tampilkan Pop-up
+            if (Notification.permission === "granted") {
+                new Notification("Pesan Baru dari " + senderName, {
+                    body: message,
+                    icon: "https://cdn-icons-png.flaticon.com/512/124/124034.png" // Ikon WA
+                });
+            }
+        }
 
-            // Simpan di Database (Room ID = gabungan 2 UID biar unik)
-            // Kita pakai cara simpel: RoomID = UID_KECIL + UID_BESAR (biar urutannya selalu sama)
-            let roomID = [myUID, friendUID].sort().join('_');
-
-            push(ref(db, 'chats/' + roomID), {
-                sender: myUID,
-                senderName: myName,
-                text: msg,
-                timestamp: serverTimestamp()
+        // --- CONTACTS ---
+        function loadContactList() {
+            const chatsRef = ref(db, 'chats');
+            onChildAdded(chatsRef, (snapshot) => {
+                const roomID = snapshot.key;
+                if (roomID.includes(myUID)) {
+                    let parts = roomID.split('_');
+                    let friendID = (parts[0] === myUID) ? parts[1] : parts[0];
+                    if (!knownContacts.has(friendID)) {
+                        knownContacts.add(friendID);
+                        renderContactItem(friendID);
+                        getUserData(friendID, (data)=>{});
+                        monitorUnreadMessages(roomID, friendID);
+                        
+                        // JALANKAN LISTENER BACKGROUND UNTUK NOTIFIKASI
+                        listenForGlobalNotifications(roomID, friendID);
+                    }
+                }
             });
+        }
 
-            document.getElementById('msg-input').value = ''; // Kosongkan input
-        };
-
-        // 3. Terima Pesan (Realtime)
-        function loadChat() {
-            let roomID = [myUID, friendUID].sort().join('_');
-            const chatRef = ref(db, 'chats/' + roomID);
-
+        // --- GLOBAL LISTENER UTK NOTIFIKASI (WALAU CHAT GAK DIBUKA) ---
+        function listenForGlobalNotifications(roomID, friendID) {
+            const chatRef = ref(db, 'chats/' + roomID + '/messages');
+            
+            // Kita pakai onChildAdded, TAPI difilter pakai waktu login
             onChildAdded(chatRef, (snapshot) => {
-                const data = snapshot.val();
-                renderBubble(data.text, data.sender === myUID ? 'me' : 'them', data.senderName);
+                const msg = snapshot.val();
                 
-                // Auto scroll ke bawah
-                const container = document.getElementById('chat-container');
-                container.scrollTop = container.scrollHeight;
+                // Syarat Notifikasi:
+                // 1. Pesan datang SETELAH kita login (bukan history lama)
+                // 2. Pengirim bukan saya sendiri
+                // 3. Pesan bukan dari system
+                if (msg.timestamp > loginTime && msg.sender !== myUID && msg.sender !== "system") {
+                    
+                    // Ambil nama pengirim dari cache globalUsersData
+                    let senderName = "Seseorang";
+                    if (globalUsersData[friendID]) senderName = globalUsersData[friendID].name;
+
+                    showNotification(senderName, msg.text);
+                }
             });
         }
 
-        function renderBubble(text, type, senderName) {
+        function monitorUnreadMessages(roomID, friendID) {
+            const chatRef = ref(db, 'chats/' + roomID + '/messages');
+            onValue(chatRef, (snapshot) => {
+                let unreadCount = 0;
+                let lastMessage = "";
+                snapshot.forEach((child) => {
+                    const msg = child.val();
+                    if (msg.sender !== myUID && !msg.read) unreadCount++;
+                    lastMessage = msg.text;
+                });
+
+                const badge = document.getElementById('badge-' + friendID);
+                const preview = document.getElementById('preview-' + friendID);
+                if (badge) {
+                    if (unreadCount > 0) {
+                        badge.innerText = unreadCount;
+                        badge.classList.remove('hidden');
+                        if(preview) { preview.style.fontWeight = "bold"; preview.style.color = "var(--text-primary)"; }
+                    } else {
+                        badge.classList.add('hidden');
+                        if(preview) { preview.style.fontWeight = "normal"; preview.style.color = "var(--text-secondary)"; }
+                    }
+                }
+                if (preview && lastMessage) preview.innerText = lastMessage.length > 25 ? lastMessage.substring(0,25)+"..." : lastMessage;
+            });
+        }
+
+        function renderContactItem(uid) {
+            const list = document.getElementById('contact-list');
             const div = document.createElement('div');
-            div.className = `bubble ${type}`;
-            div.innerHTML = `<span class="sender">${senderName}</span>${text}`;
-            document.getElementById('chat-container').appendChild(div);
+            div.className = 'contact-item';
+            div.id = 'contact-' + uid;
+            div.onclick = () => openChat(uid);
+            div.innerHTML = `
+                <img src="https://via.placeholder.com/45" class="contact-avatar">
+                <div class="contact-info">
+                    <div class="contact-name">User ${uid.substring(0,4)}..</div>
+                    <div class="contact-preview" id="preview-${uid}">...</div>
+                </div>
+                <div id="badge-${uid}" class="unread-badge hidden">0</div>
+            `;
+            list.appendChild(div);
+        }
+
+        // --- CHAT LOGIC ---
+        function openChat(friendID) {
+            if (unsubscribeAdded) unsubscribeAdded();
+            if (unsubscribeChanged) unsubscribeChanged();
+            if (unsubscribeExpiry) unsubscribeExpiry();
+            if (unsubscribeTyping) unsubscribeTyping();
+
+            activeFriendUID = friendID;
+            currentRoomID = [myUID, friendID].sort().join('_'); 
+            
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('chat-header').style.visibility = 'visible';
+            document.getElementById('chat-footer').style.visibility = 'visible';
+            
+            getUserData(friendID, (data) => {
+                document.getElementById('current-friend-name').innerText = data.name;
+                const bioEl = document.getElementById('current-friend-bio');
+                bioEl.innerText = data.bio;
+                bioEl.setAttribute('data-original-bio', data.bio);
+                bioEl.classList.remove('typing-text');
+                document.getElementById('header-friend-avatar').src = data.avatar || "https://via.placeholder.com/40";
+            });
+
+            document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+            let item = document.getElementById('contact-' + friendID);
+            if(item) item.classList.add('active');
+
+            const msgBox = document.getElementById('messages-box');
+            msgBox.innerHTML = ''; 
+            
+            monitorExpirySettings(currentRoomID);
+            monitorTypingStatus(currentRoomID, friendID); 
+
+            const chatMessagesRef = ref(db, 'chats/' + currentRoomID + '/messages');
+            markMessagesAsRead(currentRoomID, friendID);
+
+            unsubscribeAdded = onChildAdded(chatMessagesRef, (snapshot) => {
+                const data = snapshot.val();
+                const key = snapshot.key;
+                
+                checkAndRemoveExpired(currentRoomID, key, data);
+                renderBubble(data, key);
+                msgBox.scrollTop = msgBox.scrollHeight;
+
+                if(data.sender === friendID && !data.read) {
+                    update(ref(db, `chats/${currentRoomID}/messages/${key}`), { read: true });
+                }
+            });
+
+            unsubscribeChanged = onChildChanged(chatMessagesRef, (snapshot) => {
+                const data = snapshot.val();
+                const key = snapshot.key;
+                const tickElement = document.getElementById(`tick-${key}`);
+                if(tickElement && data.sender === myUID && data.read) {
+                    tickElement.classList.add('read');
+                }
+            });
+        }
+
+        // --- TYPING INDICATOR ---
+        window.handleTyping = () => {
+            if (!currentRoomID) return;
+            update(ref(db, `chats/${currentRoomID}/typing/${myUID}`), { isTyping: true });
+            if (typingTimeout) clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                update(ref(db, `chats/${currentRoomID}/typing/${myUID}`), { isTyping: false });
+            }, 2000);
+        };
+
+        function monitorTypingStatus(roomID, friendID) {
+            const typingRef = ref(db, `chats/${roomID}/typing/${friendID}/isTyping`);
+            unsubscribeTyping = onValue(typingRef, (snapshot) => {
+                const isTyping = snapshot.val();
+                const bioEl = document.getElementById('current-friend-bio');
+                if (isTyping === true) {
+                    bioEl.innerText = "sedang mengetik...";
+                    bioEl.classList.add('typing-text');
+                } else {
+                    const originalBio = bioEl.getAttribute('data-original-bio') || "Online";
+                    bioEl.innerText = originalBio;
+                    bioEl.classList.remove('typing-text');
+                }
+            });
+        }
+
+        // --- DISAPPEARING MESSAGES ---
+        let currentExpiryHours = 0; 
+        function monitorExpirySettings(roomID) {
+            const settingsRef = ref(db, 'chats/' + roomID + '/settings/expiryHours');
+            unsubscribeExpiry = onValue(settingsRef, (snapshot) => {
+                const hours = snapshot.val() || 0;
+                currentExpiryHours = hours;
+                const dot = document.getElementById('timer-active-dot');
+                if (hours > 0) dot.style.display = 'flex'; else dot.style.display = 'none';
+                const radios = document.getElementsByName('expiry');
+                radios.forEach(r => { if (parseInt(r.value) === hours) r.checked = true; });
+            });
+        }
+
+        function checkAndRemoveExpired(roomID, msgKey, msgData) {
+            if (currentExpiryHours > 0) {
+                const msgTime = msgData.timestamp;
+                const expirationTime = currentExpiryHours * 60 * 60 * 1000;
+                const timeNow = Date.now();
+                if ((timeNow - msgTime) > expirationTime) {
+                    remove(ref(db, `chats/${roomID}/messages/${msgKey}`));
+                    const bubble = document.getElementById(`msg-${msgKey}`);
+                    if(bubble) bubble.style.display = 'none';
+                }
+            }
+        }
+
+        window.openExpiryModal = () => document.getElementById('expiry-modal').style.display = 'flex';
+        window.selectExpiry = (hours) => {
+            if(currentRoomID) {
+                set(ref(db, 'chats/' + currentRoomID + '/settings/expiryHours'), hours);
+                let text = "";
+                if (hours === 24) text = "Pesan sementara diset 24 Jam.";
+                else if (hours === 168) text = "Pesan sementara diset 7 Hari.";
+                else if (hours === 720) text = "Pesan sementara diset 30 Hari.";
+                else text = "Pesan sementara dimatikan.";
+                push(ref(db, 'chats/' + currentRoomID + '/messages'), { sender: "system", text: text, timestamp: serverTimestamp(), read: true });
+            }
+            window.closeModal('expiry-modal');
+        }
+
+        // --- UTILS ---
+        function markMessagesAsRead(roomID, friendID) {
+             const chatRef = ref(db, 'chats/' + roomID + '/messages');
+             onValue(chatRef, (snapshot) => {
+                const updates = {};
+                snapshot.forEach((child) => {
+                    const msg = child.val();
+                    if (msg.sender === friendID && !msg.read) { updates[child.key + '/read'] = true; }
+                });
+                if (Object.keys(updates).length > 0) update(chatRef, updates);
+             }, { onlyOnce: true });
+        }
+
+        function renderBubble(data, key) {
+            if (!data) return;
+            const msgBox = document.getElementById('messages-box');
+            if (data.sender === "system") {
+                const div = document.createElement('div');
+                div.className = 'system-msg';
+                div.innerHTML = `Info: ${data.text}`;
+                msgBox.appendChild(div);
+                return;
+            }
+            const isMe = (data.sender === myUID);
+            const div = document.createElement('div');
+            div.className = `bubble ${isMe ? 'me' : 'them'}`;
+            div.id = `msg-${key}`;
+            let timeStr = data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
+            let tickHTML = "";
+            if (isMe) {
+                let colorClass = data.read ? 'read' : ''; 
+                tickHTML = `<span id="tick-${key}" class="tick ${colorClass}" style="margin-left:3px;">✓✓</span>`;
+            }
+            div.innerHTML = `${data.text}<div class="bubble-time">${timeStr} ${tickHTML}</div>`;
+            msgBox.appendChild(div);
+        }
+
+        window.kirimPesan = () => {
+            let input = document.getElementById('msg-input');
+            let msg = input.value;
+            if(!msg || !activeFriendUID) return;
+            
+            update(ref(db, `chats/${currentRoomID}/typing/${myUID}`), { isTyping: false });
+            if (typingTimeout) clearTimeout(typingTimeout);
+
+            push(ref(db, 'chats/' + currentRoomID + '/messages'), {
+                sender: myUID,
+                text: msg,
+                timestamp: serverTimestamp(),
+                read: false
+            });
+            input.value = '';
+        };
+
+        function getUserData(uid, callback) {
+            if (globalUsersData[uid]) callback(globalUsersData[uid]); 
+            onValue(ref(db, 'users/' + uid), (snapshot) => {
+                const data = snapshot.val() || { name: "User", bio: "...", avatar: "https://via.placeholder.com/40" };
+                globalUsersData[uid] = data;
+                callback(data);
+                const contactItem = document.getElementById('contact-' + uid);
+                if (contactItem) {
+                    contactItem.querySelector('.contact-name').innerText = data.name;
+                    contactItem.querySelector('.contact-avatar').src = data.avatar || "https://via.placeholder.com/40";
+                }
+                if (activeFriendUID === uid) {
+                    document.getElementById('current-friend-name').innerText = data.name;
+                    const bioEl = document.getElementById('current-friend-bio');
+                    if (!bioEl.classList.contains('typing-text')) {
+                        bioEl.innerText = data.bio;
+                    }
+                    bioEl.setAttribute('data-original-bio', data.bio); 
+                    document.getElementById('header-friend-avatar').src = data.avatar || "https://via.placeholder.com/40";
+                }
+            });
         }
         
-        // Fitur Copy UID
-        window.copyUID = () => {
-            navigator.clipboard.writeText(myUID);
-            alert("UID disalin!");
+        function updateMyProfileUI(name, bio, avatar) {
+            document.getElementById('my-name-display').innerText = name || "User";
+            if(avatar) document.getElementById('my-avatar-display').src = avatar;
         }
+        function saveToDB(name, bio, avatar) { set(ref(db, 'users/' + myUID), { name, bio, avatar }); }
+        
+        window.openProfileModal = () => document.getElementById('profile-modal').style.display = 'flex';
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+        window.saveProfile = () => { saveToDB(document.getElementById('edit-name').value, document.getElementById('edit-bio').value, document.getElementById('preview-avatar').src); window.closeModal('profile-modal'); }
+        window.previewImage = () => {
+            const file = document.getElementById('file-input').files[0];
+            if(file && file.size < 100000) {
+                const reader = new FileReader();
+                reader.onloadend = () => document.getElementById('preview-avatar').src = reader.result;
+                reader.readAsDataURL(file);
+            } else alert("File terlalu besar");
+        }
+        window.copyUID = () => navigator.clipboard.writeText(myUID).then(()=>alert("UID tersalin"));
+        window.handleEnter = (e) => { if(e.key === 'Enter') kirimPesan(); };
+        window.manualStartChat = () => {
+            let uid = document.getElementById('new-friend-uid').value.trim();
+            if(uid) { knownContacts.add(uid); renderContactItem(uid); openChat(uid); }
+        };
     </script>
 </body>
 </html>
-
