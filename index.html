@@ -3,121 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Clone</title>
+    <title>WhatsApp Clone - Private Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- COPY CSS DARI SEBELUMNYA ATAU BIARKAN CSS INI --- */
+        /* CSS DASAR */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: #d1d7db; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        
+        /* LOGIN SCREEN */
         #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
-        .app-container { display: none; width: 100%; max-width: 1000px; height: 90vh; background: #fff; display: none; } /* Default hidden */
-        .chat-window { width: 100%; display: flex; flex-direction: column; background: #efeae2; height: 100%; }
-        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
-        .message { max-width: 65%; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; position: relative; }
-        .message.sent { background-color: #d9fdd3; align-self: flex-end; }
-        .message.received { background-color: #fff; align-self: flex-start; }
+        .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        
+        /* LAYOUT APLIKASI */
+        .app-container { display: none; width: 100%; max-width: 1400px; height: 95vh; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        /* SIDEBAR (KIRI) */
+        .sidebar { width: 30%; border-right: 1px solid #ddd; display: flex; flex-direction: column; background: white; }
+        .my-profile { padding: 15px; background: #f0f2f5; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; }
+        .my-id-display { background: #fff; padding: 5px 10px; border-radius: 5px; font-size: 12px; border: 1px dashed #00a884; cursor: pointer; }
+        
+        .add-friend-box { padding: 10px; border-bottom: 1px solid #eee; display: flex; gap: 5px; }
+        .add-friend-box input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px; outline: none; }
+        .add-friend-box button { background: #00a884; color: white; border: none; padding: 0 15px; border-radius: 5px; cursor: pointer; }
+        
+        .contact-list { flex: 1; overflow-y: auto; }
+        .contact-item { display: flex; align-items: center; padding: 15px; cursor: pointer; border-bottom: 1px solid #f5f5f5; transition: 0.2s; }
+        .contact-item:hover { background: #f5f5f5; }
+        .contact-item.active { background: #f0f2f5; }
+        .contact-item img { width: 45px; height: 45px; border-radius: 50%; margin-right: 15px; }
+        
+        /* CHAT WINDOW (KANAN) */
+        .chat-window { width: 70%; display: flex; flex-direction: column; background: #efeae2; }
+        .chat-header { padding: 10px 20px; background: #f0f2f5; border-bottom: 1px solid #ddd; display: flex; align-items: center; height: 60px; }
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: 300px; }
+        
+        .message { max-width: 65%; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+        .message.sent { background-color: #d9fdd3; align-self: flex-end; border-top-right-radius: 0; }
+        .message.received { background-color: #fff; align-self: flex-start; border-top-left-radius: 0; }
+        
         .chat-input { height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 0 20px; }
-        .chat-input input { flex: 1; padding: 10px; border-radius: 8px; border: none; outline: none; margin: 0 10px; }
-        button { padding: 10px 20px; background: #00a884; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .chat-input input { flex: 1; padding: 12px; border-radius: 8px; border: none; outline: none; margin: 0 10px; }
+        
+        /* Utility */
+        .hidden { display: none !important; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; display: flex; }
+            .chat-window { display: none; width: 100%; }
+            .app-container.chat-active .sidebar { display: none; }
+            .app-container.chat-active .chat-window { display: flex; }
+            .back-btn { display: block !important; margin-right: 10px; cursor: pointer; }
+        }
+        .back-btn { display: none; }
     </style>
 </head>
 <body>
 
     <div id="loginScreen">
-        <h2>WA Clone Login</h2>
-        <button onclick="loginGoogle()">Login dengan Google</button>
+        <div class="login-box">
+            <h2 style="margin-bottom: 15px; color:#00a884;">WA Clone Ngawi</h2>
+            <p style="margin-bottom: 20px; color: #666;">Login untuk mendapatkan ID Unik kamu.</p>
+            <button onclick="loginGoogle()" style="padding:10px 20px; background:#4285F4; color:white; border:none; border-radius:5px; cursor:pointer;">
+                <i class="fa-brands fa-google"></i> Login Google
+            </button>
+        </div>
     </div>
 
     <div class="app-container" id="appContainer">
-        <div class="chat-window">
-            <div style="padding:15px; background:#f0f2f5; border-bottom:1px solid #ddd;">
-                <h4>Grup Chat Ngawi</h4>
+        
+        <div class="sidebar">
+            <div class="my-profile">
+                <div style="display:flex; align-items:center;">
+                    <img id="myPhoto" src="" style="width:40px; height:40px; border-radius:50%; margin-right:10px;">
+                    <div>
+                        <h4 style="font-size:14px;">Saya</h4>
+                        <div class="my-id-display" onclick="copyMyId()" title="Klik untuk copy">
+                            ID: <span id="myUniqueId">...</span> <i class="fa-regular fa-copy"></i>
+                        </div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-ellipsis-vertical" style="color:#54656f;"></i>
             </div>
-            <div class="chat-box" id="chatBox"></div>
+
+            <div class="add-friend-box">
+                <input type="text" id="friendIdInput" placeholder="Masukkan ID Teman (6 digit)">
+                <button onclick="addFriend()"><i class="fa-solid fa-plus"></i> Chat</button>
+            </div>
+
+            <div class="contact-list" id="contactList">
+                <div style="padding:20px; text-align:center; color:#999; font-size:13px;">
+                    Belum ada chat. Masukkan ID teman di atas.
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-window">
+            <div class="chat-header">
+                <i class="fa-solid fa-arrow-left back-btn" onclick="closeChat()"></i>
+                <img id="headerImg" src="https://via.placeholder.com/40" style="width:40px; height:40px; border-radius:50%; margin-right:10px;">
+                <h4 id="headerName">Pilih kontak untuk chat</h4>
+            </div>
+
+            <div class="chat-box" id="chatBox">
+                </div>
+
             <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Ketik pesan...">
-                <button onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                <input type="text" id="messageInput" placeholder="Ketik pesan..." disabled>
+                <i class="fa-solid fa-paper-plane" onclick="sendMessage()" style="color:#54656f; font-size:20px; cursor:pointer; margin-left:10px;"></i>
             </div>
         </div>
     </div>
 
     <script type="module">
-        // 1. Import pakai URL lengkap (Solusi Error Gambar 1)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, onSnapshot, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // 2. Config asli punya Mas Kulin
+        // --- MASUKKAN CONFIG FIREBASE KAMU DISINI ---
         const firebaseConfig = {
-            apiKey: "AIzaSyDHd3g5X-nJpeW5bvd4tdCp1fdv8nvqsn4",
+            apiKey: "AIzaSyDHd3g5X-nJpeW5bvd4tdCp1fdv8nvqsn4", // Pastikan ini benar
             authDomain: "whatsapp-clone-e158f.firebaseapp.com",
             projectId: "whatsapp-clone-e158f",
             storageBucket: "whatsapp-clone-e158f.firebasestorage.app",
             messagingSenderId: "544454324372",
             appId: "1:544454324372:web:011c4b6ddaa3d053318481"
-            // measurementId dihapus karena analytics bikin error di browser biasa
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
-        let currentUser = null;
 
-        // Fungsi Login
+        let currentUser = null;
+        let currentChatUser = null; // Orang yang sedang kita chat
+        let currentChatRoomId = null; // ID Ruangan Chat (Gabungan UID)
+        let unsubscribeMessages = null; // Untuk stop update chat kalau ganti room
+
+        // --- FUNGSI LOGIN & BUAT ID UNIQUE ---
         window.loginGoogle = () => {
-            signInWithPopup(auth, provider).catch((error) => {
-                alert("Gagal Login: " + error.message);
-                console.error(error);
-            });
+            signInWithPopup(auth, provider).catch(err => alert(err.message));
         };
 
-        // Cek User Login
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'flex'; // Munculkan chat
-                loadMessages();
+                document.getElementById('appContainer').style.display = 'flex';
+                document.getElementById('myPhoto').src = user.photoURL;
+
+                // Cek apakah user sudah punya data di Database 'users'
+                const userRef = doc(db, "users", user.uid);
+                
+                // Kita coba ambil datanya. Kalau gak ada, kita buat baru + ID Unik
+                try {
+                    // Karena ini statis, kita pakai trik simpel:
+                    // Kita simpan ID unik di dokumen user.
+                    // Generate ID Random 6 Karakter
+                    const randomId = Math.random().toString(36).substr(2, 6).toUpperCase();
+                    
+                    // Simpan/Update data user (merge: true artinya kalau udah ada gak ditimpa semua)
+                    // Note: Di app beneran, kita harus cek dulu ID-nya kembar atau gak. 
+                    // Tapi peluang kembar 6 digit kecil, jadi aman buat belajar.
+                    await setDoc(userRef, {
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        email: user.email,
+                        // Jika friendId belum ada, pakai yang baru. Jika sudah ada, jangan ditimpa.
+                        friendId: user.friendId || randomId 
+                    }, { merge: true });
+
+                    // Tampilkan ID di Layar
+                    // Kita harus fetch ulang untuk memastikan kita menampilkan ID yang tersimpan
+                    // (Karena kode di atas 'merge', kita butuh data finalnya)
+                    // Tapi untuk cepat, kita ambil dari user object lokal dulu jika ada
+                    // Trik: Simpan ID di localStorage biar cepat
+                    document.getElementById('myUniqueId').innerText = "Loading...";
+                    
+                    // Baca ulang data user untuk memastikan ID yang benar
+                    // (Kita gunakan query snapshot user sendiri)
+                    onSnapshot(userRef, (doc) => {
+                        const data = doc.data();
+                        if(data) {
+                            document.getElementById('myUniqueId').innerText = data.friendId;
+                            currentUser.friendId = data.friendId; // Simpan di memori
+                        }
+                    });
+
+                } catch (e) {
+                    console.error("Error setting user:", e);
+                }
+
+            } else {
+                document.getElementById('loginScreen').style.display = 'flex';
             }
         });
 
-        // Kirim Pesan
-        window.sendMessage = async () => {
-            const input = document.getElementById('messageInput');
-            if (input.value.trim() === "") return;
-            try {
-                await addDoc(collection(db, "messages"), {
-                    text: input.value,
-                    uid: currentUser.uid,
-                    createdAt: new Date()
-                });
-                input.value = "";
-            } catch (e) { console.error("Error:", e); }
+        // --- FITUR COPY ID ---
+        window.copyMyId = () => {
+            const id = document.getElementById('myUniqueId').innerText;
+            navigator.clipboard.writeText(id);
+            alert("ID tercopy: " + id + "\nKirimi temanmu ID ini!");
         };
 
-        // Baca Pesan
-        function loadMessages() {
-            const q = query(collection(db, "messages"), orderBy("createdAt"));
-            onSnapshot(q, (snapshot) => {
-                const chatBox = document.getElementById('chatBox');
-                chatBox.innerHTML = "";
+        // --- CARI TEMAN & MULAI CHAT ---
+        window.addFriend = async () => {
+            const friendId = document.getElementById('friendIdInput').value.trim().toUpperCase();
+            if (!friendId) return alert("Masukkan ID teman dulu!");
+            if (friendId === currentUser.friendId) return alert("Itu ID kamu sendiri :(");
+
+            // Cari user dengan friendId tersebut
+            const q = query(collection(db, "users"), where("friendId", "==", friendId));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                alert("Teman dengan ID " + friendId + " tidak ditemukan!");
+                return;
+            }
+
+            // Jika ketemu
+            querySnapshot.forEach((doc) => {
+                const friendData = doc.data();
+                openChat(friendData);
+            });
+        };
+
+        // --- BUKA ROOM CHAT ---
+        function openChat(friendData) {
+            currentChatUser = friendData;
+            
+            // UI Update
+            document.getElementById('headerName').innerText = friendData.displayName;
+            document.getElementById('headerImg').src = friendData.photoURL;
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('messageInput').focus();
+            
+            // Tampilan Mobile
+            document.getElementById('appContainer').classList.add('chat-active');
+
+            // Logic Room ID: Gabungan UID (Diurutkan abjad biar A chat B sama dengan B chat A)
+            // Contoh: UID "ABC" dan "DEF" -> Room ID "ABC_DEF"
+            const uids = [currentUser.uid, friendData.uid].sort();
+            currentChatRoomId = uids.join("_");
+
+            console.log("Chatting di Room:", currentChatRoomId);
+
+            // Load Chat History
+            loadChatMessages(currentChatRoomId);
+        }
+
+        // --- LOAD PESAN ---
+        function loadChatMessages(roomId) {
+            const chatBox = document.getElementById('chatBox');
+            chatBox.innerHTML = ""; // Bersihkan layar
+
+            if (unsubscribeMessages) unsubscribeMessages(); // Stop listener chat sebelumnya
+
+            // Query pesan di Room ini saja
+            const q = query(collection(db, "messages"), where("roomId", "==", roomId), orderBy("createdAt", "asc"));
+
+            unsubscribeMessages = onSnapshot(q, (snapshot) => {
+                chatBox.innerHTML = ""; 
                 snapshot.forEach((doc) => {
                     const msg = doc.data();
+                    const isMe = msg.senderUid === currentUser.uid;
+                    
                     const div = document.createElement('div');
-                    div.className = `message ${msg.uid === currentUser.uid ? 'sent' : 'received'}`;
-                    div.innerText = msg.text;
+                    div.className = `message ${isMe ? 'sent' : 'received'}`;
+                    div.innerHTML = `<p>${msg.text}</p>`;
                     chatBox.appendChild(div);
                 });
                 chatBox.scrollTop = chatBox.scrollHeight;
             });
         }
-        
-        // Enter key
+
+        // --- KIRIM PESAN ---
+        window.sendMessage = async () => {
+            const input = document.getElementById('messageInput');
+            const text = input.value;
+            if (!text.trim() || !currentChatRoomId) return;
+
+            try {
+                await addDoc(collection(db, "messages"), {
+                    text: text,
+                    senderUid: currentUser.uid,
+                    roomId: currentChatRoomId, // Kunci rahasia chat ini
+                    createdAt: new Date()
+                });
+                input.value = "";
+            } catch (e) {
+                console.error("Gagal kirim:", e);
+            }
+        };
+
+        // --- UTILS UI ---
+        window.closeChat = () => {
+            document.getElementById('appContainer').classList.remove('chat-active');
+        };
+
         document.getElementById('messageInput').addEventListener('keypress', (e) => {
-             if(e.key === 'Enter') window.sendMessage(); 
+            if(e.key === 'Enter') window.sendMessage();
         });
     </script>
 </body>
