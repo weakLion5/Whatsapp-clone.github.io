@@ -1,0 +1,593 @@
+/* =========================================
+   1. VARIABEL & RESET (THEMING)
+========================================= */
+:root {
+    /* Mode Terang (Default) */
+    --bg-body: #d1d7db;
+    --bg-sidebar: #ffffff;
+    --bg-header: #f0f2f5;
+    --bg-chat: #efeae2;
+    --bg-input: #ffffff;
+    --border-color: #e9edef;
+    --text-primary: #111b21;
+    --text-secondary: #667781;
+    --my-bubble: #d9fdd3;
+    --friend-bubble: #ffffff;
+    --green-primary: #00a884;
+    --green-dark: #008069;
+    --reply-bg: rgba(0,0,0,0.05);
+    --modal-bg: #ffffff;
+    --hover-color: #f5f6f6;
+    --active-color: #f0f2f5;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+body.dark-mode {
+    /* Mode Gelap */
+    --bg-body: #090e11;
+    --bg-sidebar: #111b21;
+    --bg-header: #202c33;
+    --bg-chat: #0b141a;
+    --bg-input: #2a3942;
+    --border-color: #2a3942;
+    --text-primary: #e9edef;
+    --text-secondary: #8696a0;
+    --my-bubble: #005c4b;
+    --friend-bubble: #202c33;
+    --green-primary: #00a884;
+    --green-dark: #00a884;
+    --reply-bg: rgba(0,0,0,0.2);
+    --modal-bg: #3b4a54;
+    --hover-color: #202c33;
+    --active-color: #2a3942;
+}
+
+* { box-sizing: border-box; transition: background-color 0.3s, border-color 0.3s; }
+
+body { 
+    font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+    margin: 0; padding: 0; 
+    background: var(--bg-body); 
+    height: 100dvh; /* Fix untuk Mobile Browser */
+    overflow: hidden; 
+    color: var(--text-primary); 
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
+body.dark-mode ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+
+/* =========================================
+   2. LOGIN SCREEN
+========================================= */
+#login-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, var(--green-dark), var(--green-primary));
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    z-index: 999; padding: 20px;
+}
+
+.login-box {
+    background: var(--modal-bg); padding: 40px 30px; border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center;
+    width: 100%; max-width: 400px; animation: fadeInUp 0.5s ease;
+}
+
+.login-title { margin-top: 0; margin-bottom: 10px; color: var(--text-primary); }
+.login-desc { color: var(--text-secondary); margin-bottom: 30px; font-size: 14px; }
+
+.btn-google-login {
+    background: #fff; color: #333; border: 1px solid #ddd; padding: 12px;
+    border-radius: 8px; cursor: pointer; display: flex; align-items: center; 
+    justify-content: center; gap: 10px; width: 100%; font-weight: 500; font-size: 15px;
+    transition: 0.2s;
+}
+.btn-google-login:hover { background: #f5f5f5; }
+
+.btn-install-login {
+    display: none; /* Default hidden, muncul lewat JS */
+    margin-top: 15px; width: 100%; padding: 12px;
+    background: var(--green-primary); color: white; border: none;
+    border-radius: 8px; font-weight: bold; cursor: pointer;
+}
+
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* =========================================
+   3. LAYOUT UTAMA (APP)
+========================================= */
+.app-container {
+    display: none; /* Hidden sebelum login */
+    width: 100%; height: 100dvh;
+    background: var(--bg-sidebar);
+    max-width: 1600px; margin: 0 auto;
+    position: relative; overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.sidebar {
+    width: 35%; min-width: 340px; 
+    border-right: 1px solid var(--border-color);
+    display: flex; flex-direction: column;
+    background: var(--bg-sidebar); height: 100%;
+    z-index: 10;
+}
+
+.chat-area {
+    flex: 1; display: flex; flex-direction: column;
+    background: var(--bg-chat);
+    position: relative; height: 100%; z-index: 5;
+}
+
+/* =========================================
+   4. HEADER & ACTIONS
+========================================= */
+.header-left, .header-right {
+    background: var(--bg-header); padding: 10px 16px; min-height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.my-profile-area { display: flex; align-items: center; cursor: pointer; flex: 1; overflow: hidden; }
+.my-avatar-img { 
+    width: 40px; height: 40px; border-radius: 50%; 
+    object-fit: cover; margin-right: 12px; 
+    border: 1px solid var(--border-color); 
+}
+.my-display-name { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.my-bio-text { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.header-actions { display: flex; align-items: center; gap: 15px; }
+.icon-btn {
+    background: none; border: none; font-size: 20px;
+    cursor: pointer; color: var(--text-secondary);
+    padding: 5px; border-radius: 50%; transition: 0.2s;
+}
+.icon-btn:hover { background: rgba(0,0,0,0.05); color: var(--green-primary); }
+.logout-btn:hover { color: #d32f2f; }
+
+.uid-badge-container {
+    font-size: 11px; background: var(--bg-input);
+    padding: 4px 8px; border-radius: 12px; border: 1px solid var(--border-color);
+    cursor: pointer; color: var(--text-secondary);
+}
+
+/* =========================================
+   5. SEARCH BAR & CONTACT LIST
+========================================= */
+.search-bar-container {
+    padding: 10px; background: var(--bg-sidebar);
+    border-bottom: 1px solid var(--border-color);
+}
+.search-input-wrapper { display: flex; gap: 5px; }
+.search-input {
+    flex: 1; padding: 8px 12px; border-radius: 8px;
+    border: 1px solid var(--border-color); background: var(--bg-header);
+    color: var(--text-primary); outline: none;
+}
+.search-btn {
+    background: var(--green-primary); color: white;
+    border: none; padding: 0 15px; border-radius: 8px;
+    cursor: pointer; font-weight: bold;
+}
+
+.contact-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.contact-item {
+    display: flex; align-items: center; padding: 12px 15px;
+    cursor: pointer; border-bottom: 1px solid var(--border-color);
+    position: relative; transition: background 0.2s;
+}
+.contact-item:hover { background: var(--hover-color); }
+.contact-item.active { background: var(--active-color); }
+
+.contact-avatar-list { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 15px; }
+.contact-info-list { flex: 1; overflow: hidden; }
+.contact-name-row { display: flex; justify-content: space-between; margin-bottom: 3px; }
+.contact-name-list { font-weight: 600; font-size: 16px; color: var(--text-primary); }
+.pin-icon { font-size: 13px; transform: rotate(45deg); display: none; margin-left: 5px; color: var(--text-secondary); }
+
+/* Menu Titik Tiga Kontak */
+.contact-menu-btn {
+    background: none; border: none; font-size: 20px;
+    color: var(--text-secondary); padding: 5px 10px;
+    opacity: 0; transition: opacity 0.2s; z-index: 20;
+}
+.contact-item:hover .contact-menu-btn { opacity: 1; }
+@media (max-width: 768px) { .contact-menu-btn { opacity: 0.8; } }
+
+/* Popup Menu Kontak */
+.contact-menu-popup {
+    position: absolute; right: 40px; top: 35px;
+    background: var(--modal-bg); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border-radius: 8px; z-index: 100; display: none;
+    flex-direction: column; min-width: 150px; overflow: hidden;
+}
+.contact-menu-item {
+    padding: 10px 15px; text-align: left; background: none;
+    border: none; color: var(--text-primary); cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+}
+.contact-menu-item:hover { background: var(--hover-color); }
+.unread-badge { background: #25d366; color: #111; padding: 2px 6px; border-radius: 10px; font-size: 11px; font-weight: bold; display: none; }
+
+/* =========================================
+   6. CHAT AREA & BUBBLES
+========================================= */
+.welcome-screen {
+    position: absolute; width: 100%; height: 100%;
+    background: var(--bg-sidebar); display: flex; flex-direction: column;
+    justify-content: center; align-items: center; z-index: 5;
+    text-align: center; color: var(--text-secondary);
+}
+
+.chat-info-wrapper { flex: 1; display: flex; align-items: center; margin-left: 10px; }
+.friend-name { font-weight: bold; color: var(--text-primary); }
+.friend-bio { font-size: 11px; color: var(--text-secondary); }
+
+.messages-container {
+    flex: 1; overflow-y: auto; padding: 20px 5%;
+    display: flex; flex-direction: column; gap: 8px;
+    background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
+    background-blend-mode: overlay; opacity: 1;
+}
+body.dark-mode .messages-container { opacity: 0.8; background-blend-mode: soft-light; }
+
+.bubble {
+    max-width: 75%; 
+    padding: 6px 10px; 
+    border-radius: 8px;
+    font-size: 14.5px; 
+    position: relative;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    word-wrap: break-word; 
+    color: var(--text-primary);
+    display: flex; 
+    flex-direction: column; 
+    
+    /* --- TAMBAHAN BARU UTK GESTURE --- */
+    cursor: default;       /* Ganti pointer jadi default */
+    user-select: none;     /* Biar teks ga ke-blok pas digeser */
+    touch-action: pan-y;   /* Izinkan scroll vertikal, tapi horizontal kita ambil alih */
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Animasi smooth */
+}
+.bubble.me { align-self: flex-end; background: var(--my-bubble); border-top-right-radius: 0; }
+.bubble.them { align-self: flex-start; background: var(--friend-bubble); border-top-left-radius: 0; }
+
+.bubble-time {
+    font-size: 10px; color: var(--text-secondary);
+    align-self: flex-end; margin-top: 4px;
+    display: flex; align-items: center; gap: 4px;
+}
+.tick { font-size: 14px; color: var(--text-secondary); }
+.tick.read { color: #53bdeb; }
+
+/* Media Content */
+.media-img { max-width: 100%; border-radius: 8px; cursor: pointer; }
+.media-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text-primary); font-weight: 600; background: rgba(0,0,0,0.05); padding: 8px; border-radius: 6px; }
+/* =========================================
+   TAMBAHAN: STYLE PESAN SISTEM (KOTAK KUNING)
+========================================= */
+
+/* Gaya dasar untuk bubble system */
+.bubble.system {
+    align-self: center; /* Posisi di tengah secara horizontal */
+    background-color: #fff5c4; /* Warna kuning khas notifikasi WA */
+    color: #5c5c5c; /* Warna teks abu tua */
+    font-size: 12.5px;
+    text-align: center;
+    border-radius: 12px; /* Sudut lebih bulat */
+    padding: 8px 12px;
+    margin: 8px auto; /* Jarak vertikal dan pastikan tengah */
+    max-width: 90%; /* Jangan terlalu lebar */
+    box-shadow: none; /* Menghilangkan bayangan bubble biasa */
+    border: none; /* Menghilangkan border radius tajam dari 'me'/'them' */
+    cursor: default; /* Tidak mengubah kursor jadi tangan */
+}
+
+/* Penyesuaian teks di dalamnya */
+.system-text {
+    display: inline-block;
+    font-weight: 500;
+}
+
+/* Override khusus untuk Dark Mode agar kuningnya tidak terlalu terang */
+body.dark-mode .bubble.system {
+    background-color: #ffeebb;
+    color: #333333;
+    opacity: 0.9;
+}
+
+/* Memastikan sudut tajam bubble chat biasa tidak terbawa */
+.bubble.system.me,
+.bubble.system.them {
+    border-radius: 12px !important;
+}
+
+/* =========================================
+   FITUR ANONYMOUS CHAT
+========================================= */
+
+/* Tombol Melayang (FAB) */
+.anon-fab {
+    position: absolute; bottom: 20px; right: 20px;
+    width: 55px; height: 55px; border-radius: 50%;
+    background: #252525; color: white; border: none;
+    font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer; transition: transform 0.2s; z-index: 50;
+    display: flex; justify-content: center; align-items: center;
+}
+.anon-fab:hover { transform: scale(1.1); background: #000; }
+
+/* Popup Searching */
+.anon-popup {
+    position: absolute; bottom: 85px; right: 20px;
+    width: 280px; background: var(--modal-bg);
+    border-radius: 12px; padding: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    z-index: 51; text-align: center;
+    border: 1px solid var(--border-color);
+    animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.anon-status { font-size: 14px; color: var(--text-secondary); margin-bottom: 15px; }
+
+.anon-actions { display: flex; flex-direction: column; gap: 8px; }
+
+/* Loader Animasi */
+.anon-loader { margin: 15px 0; }
+.spinner {
+    width: 30px; height: 30px; border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--green-primary); border-radius: 50%;
+    animation: spin 1s linear infinite; margin: 0 auto 10px;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* Tombol Stop di Header Chat */
+.btn-stop-anon {
+    background: #d32f2f; color: white; border: none;
+    padding: 6px 12px; border-radius: 6px; font-weight: bold;
+    cursor: pointer; margin-right: 10px; font-size: 13px;
+    animation: pulseRed 2s infinite;
+}
+
+/* Override Tampilan Header saat Mode Anonymous */
+body.anon-mode .friend-name { color: #d32f2f !important; font-family: 'Courier New', monospace; letter-spacing: 1px; }
+body.anon-mode .chat-area { background-image: none; background-color: #1a1a1a; } /* Background Gelap Misterius */
+
+/* =========================================
+   7. FOOTER & INPUT
+========================================= */
+.footer-wrapper { background: var(--bg-header); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; }
+
+.reply-preview-bar {
+    background: var(--bg-input); padding: 8px 15px;
+    border-left: 5px solid var(--green-primary);
+    display: none; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+.reply-label { color: var(--green-primary); font-size: 12px; font-weight: bold; }
+.reply-content { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); }
+
+.chat-footer {
+    min-height: 60px; padding: 8px 10px;
+    display: flex; align-items: center; gap: 8px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.btn-media {
+    width: 35px; height: 35px; border-radius: 50%; border: none;
+    background: none; color: var(--text-secondary); cursor: pointer;
+    font-size: 20px; display: flex; justify-content: center; align-items: center;
+}
+.btn-media:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); }
+
+.chat-input-container {
+    flex: 1; background: var(--bg-input); border-radius: 24px;
+    padding: 8px 15px; border: 1px solid var(--border-color);
+    display: flex; align-items: center;
+}
+.chat-input {
+    flex: 1; border: none; background: none; outline: none;
+    font-size: 15px; color: var(--text-primary); max-height: 100px; overflow-y: auto;
+}
+
+.btn-send-mic {
+    width: 42px; height: 42px; border-radius: 50%; border: none;
+    background: var(--green-primary); color: white; cursor: pointer;
+    font-size: 20px; display: flex; justify-content: center; align-items: center;
+    flex-shrink: 0; box-shadow: var(--shadow-sm); transition: 0.2s;
+}
+.btn-send-mic.hidden { display: none; }
+.btn-send-mic.recording { background: #d32f2f; animation: pulseRed 1s infinite; }
+@keyframes pulseRed { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+/* =========================================
+   FITUR EMOJI PICKER
+========================================= */
+.emoji-picker {
+    position: absolute;
+    bottom: 70px; /* Muncul di atas footer */
+    left: 10px;
+    width: 300px;
+    height: 250px;
+    background: var(--modal-bg);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    border: 1px solid var(--border-color);
+}
+
+.emoji-header {
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--text-secondary);
+    padding: 8px 10px;
+    background: var(--bg-header);
+    position: sticky;
+    top: 0;
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr); /* 8 Emoji per baris */
+    gap: 5px;
+    padding: 10px;
+}
+
+.emoji-item {
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    transition: 0.2s;
+    user-select: none;
+}
+
+.emoji-item:hover {
+    background-color: var(--hover-color);
+    transform: scale(1.2);
+}
+
+/* Responsif Mobile */
+@media (max-width: 768px) {
+    .emoji-picker {
+        width: 95%; /* Lebar penuh di HP */
+        left: 2.5%;
+        bottom: 65px;
+    }
+    .emoji-grid {
+        grid-template-columns: repeat(7, 1fr);
+    }
+}
+/* =========================================
+   MENU LAMPIRAN (ATTACHMENT)
+========================================= */
+.attach-menu {
+    position: absolute;
+    bottom: 70px; /* Muncul di atas footer */
+    left: 50px;   /* Geser dikit dari kiri (sebelah emoji) */
+    background: var(--modal-bg);
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    min-width: 180px;
+    animation: popUp 0.2s ease-out;
+}
+
+.attach-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: 0.2s;
+}
+.attach-item:hover { background: var(--hover-color); }
+
+.attach-icon {
+    width: 35px; height: 35px;
+    border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    color: white; font-size: 18px;
+}
+
+@keyframes popUp {
+    from { transform: scale(0.8) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* =========================================
+   8. MODALS & POPUPS
+========================================= */
+.overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 90; }
+
+.modal {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 600;
+    justify-content: center; align-items: center;
+}
+.modal-content {
+    background: var(--modal-bg); padding: 25px; border-radius: 15px;
+    width: 90%; max-width: 380px; text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-input {
+    width: 100%; padding: 12px; margin: 10px 0;
+    border: 1px solid var(--border-color); border-radius: 8px;
+    background: var(--bg-input); color: var(--text-primary);
+}
+
+.msg-options {
+    display: none; position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); background: var(--modal-bg);
+    padding: 5px 0; border-radius: 12px; z-index: 500;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 220px; overflow: hidden;
+}
+.msg-btn {
+    display: block; width: 100%; padding: 14px 20px;
+    border: none; background: none; color: var(--text-primary);
+    font-size: 15px; cursor: pointer; text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+.msg-btn:hover { background: var(--hover-color); }
+.delete-text { color: #d32f2f; }
+
+/* Expiry Options */
+.expiry-item {
+    padding: 12px; border-bottom: 1px solid var(--border-color);
+    cursor: pointer; text-align: left; font-weight: 500;
+}
+.expiry-item:hover { background: var(--hover-color); }
+
+/* Avatar Edit */
+.avatar-edit-wrapper { position: relative; width: 80px; height: 80px; margin: 10px auto; }
+.avatar-edit-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid var(--green-primary); }
+.avatar-edit-icon {
+    position: absolute; bottom: 0; right: 0;
+    background: var(--green-primary); color: white;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: 2px solid var(--modal-bg); font-size: 14px;
+}
+
+.modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+.btn-primary { flex: 1; padding: 10px; background: var(--green-primary); color: white; border: none; border-radius: 8px; cursor: pointer; }
+.btn-secondary { flex: 1; padding: 10px; background: transparent; border: 1px solid var(--text-secondary); color: var(--text-primary); border-radius: 8px; cursor: pointer; }
+.btn-text { background: none; border: none; color: var(--text-secondary); cursor: pointer; margin-top: 10px; width: 100%; padding: 10px; }
+
+/* =========================================
+   9. RESPONSIVE (MOBILE)
+========================================= */
+.back-btn { display: none; font-size: 24px; margin-right: 15px; cursor: pointer; }
+
+@media (max-width: 768px) {
+    .app-container { border-radius: 0; }
+    .sidebar { width: 100%; position: absolute; top: 0; left: 0; height: 100%; transition: transform 0.3s ease-in-out; }
+    .chat-area { width: 100%; position: absolute; top: 0; left: 0; height: 100%; transform: translateX(100%); transition: transform 0.3s ease-in-out; }
+
+    /* Logic Slide Animasi */
+    body.mobile-chat-active .sidebar { transform: translateX(-30%); opacity: 0; pointer-events: none; }
+    body.mobile-chat-active .chat-area { transform: translateX(0); }
+
+    .back-btn { display: block; }
+    .header-left, .header-right { padding: 8px 12px; }
+    .messages-container { padding: 15px 4%; }
+}
+
+.typing-text { color: var(--green-primary); font-weight: bold; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+.hidden { display: none !important; }
