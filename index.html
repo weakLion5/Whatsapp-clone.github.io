@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Clone - Ngawi Connect</title>
+    <title>WhatsApp Clone</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    
     <style>
         * {
             margin: 0;
@@ -49,7 +48,7 @@
             font-size: 16px;
             font-weight: bold;
             margin-top: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             transition: 0.3s;
         }
 
@@ -59,13 +58,12 @@
 
         /* Container Aplikasi */
         .app-container {
-            display: none;
-            /* Default hidden sampai login */
+            display: none; /* Default hidden sampai login */
             width: 100%;
             max-width: 1600px;
             height: 100vh;
             background-color: #fff;
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
@@ -119,8 +117,7 @@
             flex: 1;
             background-color: #efeae2;
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-            background-size: 400px;
-            /* Ukuran pattern */
+            background-size: 400px; /* Ukuran pattern */
             padding: 20px;
             overflow-y: auto;
             display: flex;
@@ -135,7 +132,7 @@
             font-size: 14px;
             position: relative;
             line-height: 1.4;
-            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
         }
 
         .message.received {
@@ -146,8 +143,7 @@
 
         .message.sent {
             background-color: #d9fdd3;
-            align-self: flex-end;
-            /* Pesan sendiri di kanan */
+            align-self: flex-end; /* Pesan sendiri di kanan */
             border-top-right-radius: 0;
         }
 
@@ -185,26 +181,18 @@
             outline: none;
             font-size: 15px;
         }
-
+        
         /* Responsive Mobile */
         @media (max-width: 700px) {
-            .sidebar {
-                display: none;
-            }
-
-            /* Sembunyikan sidebar di HP biar fokus chat */
-            .chat-window {
-                width: 100%;
-            }
+            .sidebar { display: none; } /* Sembunyikan sidebar di HP biar fokus chat */
+            .chat-window { width: 100%; }
         }
     </style>
 </head>
-
 <body>
 
     <div id="loginScreen">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png"
-            width="80" style="margin-bottom: 20px;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png" width="80" style="margin-bottom: 20px;">
         <h2>Selamat Datang di WA Clone</h2>
         <p style="color: #666;">Login dulu biar bisa chattingan sama yang lain</p>
         <button class="login-btn" onclick="loginGoogle()">
@@ -216,7 +204,7 @@
         <div class="sidebar">
             <div class="header">
                 <div class="user-img" id="myProfilePic">
-                </div>
+                    </div>
                 <div class="nav-icons">
                     <i class="fa-solid fa-users"></i>
                     <i class="fa-solid fa-message"></i>
@@ -232,8 +220,7 @@
         <div class="chat-window">
             <div class="header">
                 <div style="display:flex; align-items:center;">
-                    <img src="https://ui-avatars.com/api/?name=Grup+Umum&background=random"
-                        style="width:40px; height:40px; border-radius:50%; margin-right:10px;">
+                    <img src="https://ui-avatars.com/api/?name=Grup+Umum&background=random" style="width:40px; height:40px; border-radius:50%; margin-right:10px;">
                     <div>
                         <h4 style="font-size:16px;">Grup Komunitas</h4>
                         <p style="font-size:12px; color:#666;">Online</p>
@@ -246,13 +233,12 @@
             </div>
 
             <div class="chat-box" id="chatBox">
-            </div>
+                </div>
 
             <div class="chat-input">
                 <i class="fa-regular fa-face-smile" style="color:#54656f; font-size:24px; cursor:pointer;"></i>
                 <input type="text" id="messageInput" placeholder="Ketik pesan">
-                <i class="fa-solid fa-paper-plane" onclick="sendMessage()"
-                    style="color:#54656f; font-size:20px; cursor:pointer; margin-left:10px;"></i>
+                <i class="fa-solid fa-paper-plane" onclick="sendMessage()" style="color:#54656f; font-size:20px; cursor:pointer; margin-left:10px;"></i>
             </div>
         </div>
     </div>
@@ -262,8 +248,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAnalytics } from "firebase/analytics";
-        
+
         // ==========================================================
         // ⚠️ GANTI KODE DI BAWAH INI DENGAN CONFIG FIREBASE KAMU ⚠️
         // ==========================================================
@@ -273,8 +258,7 @@
             projectId: "whatsapp-clone-e158f",
             storageBucket: "whatsapp-clone-e158f.firebasestorage.app",
             messagingSenderId: "544454324372",
-            appId: "1:544454324372:web:011c4b6ddaa3d053318481",
-            measurementId: "G-KP67VJP7JW"
+            appId: "1:544454324372:web:011c4b6ddaa3d053318481"
         };
         // ==========================================================
 
@@ -283,7 +267,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
-        const analytics = getAnalytics(app);
 
         let currentUser = null;
 
@@ -305,7 +288,7 @@
                 // Sembunyikan Login, Tampilkan Chat
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'flex';
-
+                
                 // Tampilkan foto profil user di sidebar
                 const profileHTML = `<img src="${user.photoURL}" alt="Profile">`;
                 document.getElementById('myProfilePic').innerHTML = profileHTML;
@@ -348,11 +331,11 @@
 
             onSnapshot(q, (snapshot) => {
                 chatBox.innerHTML = ""; // Bersihkan chat box sebelum render ulang
-
+                
                 snapshot.forEach((doc) => {
                     const msg = doc.data();
                     const isMe = msg.uid === currentUser.uid;
-
+                    
                     // Format waktu sederhana
                     let timeString = "";
                     if (msg.createdAt) {
@@ -363,16 +346,16 @@
                     // Buat elemen chat
                     const div = document.createElement('div');
                     div.className = `message ${isMe ? 'sent' : 'received'}`;
-
+                    
                     // Isi HTML pesan
                     let nameTag = isMe ? '' : `<span class="sender-name">${msg.name}</span>`;
-
+                    
                     div.innerHTML = `
                         ${nameTag}
                         <p>${msg.text}</p>
                         <span class="time">${timeString}</span>
                     `;
-
+                    
                     chatBox.appendChild(div);
                 });
 
@@ -389,5 +372,4 @@
         });
     </script>
 </body>
-
 </html>
