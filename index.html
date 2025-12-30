@@ -187,6 +187,8 @@
             .messages-container { padding: 10px 3%; }
             .delete-chat-btn { opacity: 0.5; }
         }
+        <link rel="manifest" href="manifest.json">
+        <meta name="theme-color" content="#008069">
     </style>
 </head>
 <body>
@@ -695,5 +697,12 @@
         window.copyUID = () => navigator.clipboard.writeText(myUID).then(()=>alert("UID tersalin"));
         window.handleEnter = (e) => { if(e.key === 'Enter') kirimPesan(); };
     </script>
+    <script>
+    // Daftarkan Service Worker biar dianggap PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
+</script>
 </body>
 </html>
+
